@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{53dca937-5938-453f-bc83-d693e2693651}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{8ac9fc5e-b538-41f4-957d-a136288bf974}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Projects">
+      <UniqueIdentifier>{5ac2be23-f136-4ec3-82d4-df249223d6bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SVM">
+      <UniqueIdentifier>{79c9a641-6af0-4e79-ac18-4f0915549fff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\svm">
+      <UniqueIdentifier>{adf22786-f3f8-434a-be8c-b7cdaaf09ebf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GeneratedFiles\qrc_imagedsp.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ImageProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\FeatureDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ColorSpaces.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\PredictSVM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\svm\svm.cpp">
+      <Filter>Source Files\svm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="imagedsp.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\prjs\color_space_conv.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\convolution_edge_detection.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\dct.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\features.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\histogram.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\interpolation.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\prjs\noise_reduction.imgdsp">
+      <Filter>Projects</Filter>
+    </None>
+    <None Include="..\..\..\..\inc\svm\svm.def">
+      <Filter>Header Files\SVM</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\inc\ImageProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\inc\FeatureDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\inc\ColorSpaces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\inc\PredictSVM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\inc\svm\svm.h">
+      <Filter>Header Files\SVM</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
