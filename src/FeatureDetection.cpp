@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include <iostream>
-
 using namespace std;
 
 #define PI 3.14159265358979323846
@@ -35,7 +34,8 @@ void extendBorders(uchar input[], int xSize, int ySize, uchar output[], int delt
 	}
 }
 
-void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double threshold, double* G, double* angle)
+
+void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* G, double* angle)
 {
 	int N = 3;
 	int delta = (N - 1) / 2;
@@ -68,18 +68,21 @@ void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double thres
 				}
 			}
 
-			// Calculate global gradient
+			// Calculate global gradient and apply threshold
 			G[j*xSize + i] = sqrt(Gh*Gh + Gv*Gv);
 
-			//calculate arctan
 			double edgeAngle = atan2(Gv, Gh);
-			edgeAngle += PI;
+			//cout << "G = " << G[j*xSize + i] << endl;
+			//cout << edgeAngle << " " << edgeAngle + 2 * PI << " " << edgeAngle * 180 / PI << " " << (edgeAngle + 2 * PI) * 180 / PI << endl;
+			if (edgeAngle < 0) {
+				edgeAngle += 2 * PI;
+			}
 			angle[j*xSize + i] = edgeAngle;
-
 		}
 	}
 
-	delete[] extendedImage;
+
+	delete[] extendedImage;	
 }
 
 
@@ -90,53 +93,53 @@ vector<double> calculateFeatureVector(const uchar input[], int xSize, int ySize)
 	vector<double> features;
 
 	uchar* Y_buff = new uchar[xSize*ySize];
-	char* U_buff = new char[xSize*ySize/4];
-	char* V_buff = new char[xSize*ySize/4];
+	char* U_buff = new char[xSize*ySize / 4];
+	char* V_buff = new char[xSize*ySize / 4];
 	RGBtoYUV420(input, xSize, ySize, Y_buff, U_buff, V_buff);
-
-	double* angle = new double[xSize*ySize];
+	
 	double* G = new double[xSize*ySize];
-	performSobelEdgeDetection(Y_buff, xSize, ySize, 0, G, angle);
+	double* angle = new double[xSize*ySize];
+	performSobelEdgeDetection(Y_buff, xSize, ySize, G, angle);
 
+	double* gr = new double[9];
+	for (int i = 0; i < 9; i++) {
+		gr[i] = 2.0 * PI * (i + 1) / 9;
+	}
+
+	double sum = 0;
 	double* histogram = new double[9];
-	for (int i = 0; i < xSize; i += 8)
-	{
-		for (int j = 0; j < ySize; j += 8)
-		{
-			//reset histogram to 0
-			for (int m = 0; m < 9; m++) {
-				histogram[m] = 0;
-			}
+	for (int i = 0; i < xSize; i += 8) {
+		for (int j = 0; j < ySize; j += 8) {
 
+			for (int p = 0; p < 9; p++)
+				histogram[p] = 0;
+
+			sum = 0;
 			for (int k1 = i; k1 < i + 8; k1++) {
 				for (int k2 = j; k2 < j + 8; k2++) {
 					
-					if ((2 * PI * 9) / 9 < angle[k2*xSize + k1]) { 
-						histogram[8] = Y_buff[k2*xSize + k1]; //360 degres(6.28 radians)
-					}
-					else { //degree is less than 360 (6.28 radians), find it
-						for (int p = 0; p < 9; p++) {
-							if (angle[k2*xSize + k1] < (2 * PI * (p + 1)) / 9) {
-								histogram[p] += G[k2*xSize + k1];
-								break;
-							}
+					sum += G[k2*xSize + k1];
+					for (int p = 0; p < 9; p++) {
+						if (angle[k2*xSize + k1] < gr[p]) {
+							//cout << angle[k2*xSize + k1] << " " << gr[p] << endl;
+							histogram[p] += G[k2*xSize + k1];
+							break;
 						}
 					}
+
 				}
 			}
 
-			//write histogram to return value
 			for (int p = 0; p < 9; p++) {
-				features.push_back(histogram[p] / 64);
+				features.push_back(histogram[p]/64);
 			}
-
 		}
 	}
-	
 
+	delete[] histogram;
+	delete[] gr;
 	delete[] G;
 	delete[] angle;
-	delete[] histogram;
 	delete[] Y_buff;
 	delete[] U_buff;
 	delete[] V_buff;
