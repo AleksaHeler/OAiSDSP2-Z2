@@ -101,25 +101,24 @@ vector<double> calculateFeatureVector(const uchar input[], int xSize, int ySize)
 	double* angle = new double[xSize*ySize];
 	performSobelEdgeDetection(Y_buff, xSize, ySize, G, angle);
 
-	double* gr = new double[9];
-	for (int i = 0; i < 9; i++) {
-		gr[i] = 2.0 * PI * (i + 1) / 9;
+	int histogramSize = 18;
+	int blockSize = 4;
+	double* gr = new double[histogramSize];
+	for (int i = 0; i < histogramSize; i++) {
+		gr[i] = 2.0 * PI * (i + 1) / histogramSize;
 	}
 
-	double sum = 0;
-	double* histogram = new double[9];
-	for (int i = 0; i < xSize; i += 8) {
-		for (int j = 0; j < ySize; j += 8) {
+	double* histogram = new double[histogramSize];
+	for (int i = 0; i < xSize; i += blockSize) {
+		for (int j = 0; j < ySize; j += blockSize) {
 
-			for (int p = 0; p < 9; p++)
+			for (int p = 0; p < histogramSize; p++)
 				histogram[p] = 0;
 
-			sum = 0;
-			for (int k1 = i; k1 < i + 8; k1++) {
-				for (int k2 = j; k2 < j + 8; k2++) {
+			for (int k1 = i; k1 < i + blockSize; k1++) {
+				for (int k2 = j; k2 < j + blockSize; k2++) {
 					
-					sum += G[k2*xSize + k1];
-					for (int p = 0; p < 9; p++) {
+					for (int p = 0; p < histogramSize; p++) {
 						if (angle[k2*xSize + k1] < gr[p]) {
 							//cout << angle[k2*xSize + k1] << " " << gr[p] << endl;
 							histogram[p] += G[k2*xSize + k1];
@@ -130,11 +129,13 @@ vector<double> calculateFeatureVector(const uchar input[], int xSize, int ySize)
 				}
 			}
 
-			for (int p = 0; p < 9; p++) {
-				features.push_back(histogram[p]/64);
+			for (int p = 0; p < histogramSize; p++) {
+				features.push_back(histogram[p]/(blockSize*blockSize));
 			}
 		}
 	}
+
+
 
 	delete[] histogram;
 	delete[] gr;

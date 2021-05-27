@@ -36,11 +36,11 @@ static void setDefaultParams(svm_parameter& param)
 	//	weight : set the parameter C of class i to weight*C, for C-SVC \n"
 
 	param.svm_type = C_SVC;
-	param.kernel_type = RBF;
+	param.kernel_type = LINEAR;
 	param.degree = 0;
 	param.gamma = 1;
 	param.coef0 = 0;
-	param.C = 10;
+	param.C = 1;
 	param.nu = 0;
 	param.cache_size = 100;
 	param.eps = 1;
