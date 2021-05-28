@@ -7,7 +7,7 @@
 
 static bool modelLoaded = false;
 static svm_model* svmModel;
-static const std::string pathSVMModelFile = "precalculated_models\\numbersSVM.model";
+static const std::string pathSVMModelFile = "mySVMModel.model";
 
 void imageProcessingFun( const QString& progName, QImage& outImgs, const QImage& inImgs, const QVector<double>& params)
 {
