@@ -16,7 +16,7 @@ std::vector<double> calculateFeatureVectorCustom(const uchar input[], int xSize,
 void extendBorders(uchar input[], int xSize, int ySize, uchar output[], int delta);
 void convolve2D(uchar image[], int xSize, int ySize, double* filterCoeff, int N);
 
-void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* G, double* edgeAngle);
+void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* angle);
 
 void nonMaxSupression(double edgeMagnitude[], uchar edgeDirection[], int xSize, int ySize, double out[]);
 void performCannyEdgeDetection(uchar input[], int xSize, int ySize, double threshold1, double threshold2, double* angle);

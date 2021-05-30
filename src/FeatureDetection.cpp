@@ -8,13 +8,174 @@ using namespace std;
 
 #define PI 3.14159265358979323846
 
-// Choose feature descriptor
+//Choose feature descriptor
 #define HOG
 //#define CUSTOM
 
-// Chose parametars
-#define BLOCK_SIZE 4 // BLOCK_SIZE 4 => 4 * 4 = 16
-#define HISTOGRAM_SIZE 18 //only has effect when using HOG
+//Chose parametars
+#define BLOCK_SIZE 4 //BLOCK_SIZE 4 => 4 * 4 = 16
+
+//Only has effect when using HOG
+#define HISTOGRAM_SIZE 18
+
+//Only has effect when using CUSTOM
+//default histogram size is 7 and size is defined in const variable in calculateFeatureVectorCustom
+//changing positions won't result in better validation
+#define HORIZONTAL_TOP 0
+#define HORIZONTAL_MIDDLE 1
+#define HORIZONTAL_BOTTOM 2
+#define VERTICAL_LEFT_TOP 3
+#define VERTICAL_LEFT_BOTTOM 4
+#define VERTICAL_RIGHT_TOP 5
+#define VERTICAL_RIGHT_BOTTOM 6
+
+std::vector<double> calculateFeatureVector(const uchar input[], int xSize, int ySize) 
+{
+
+#if defined(HOG)
+	return calculateFeatureVectorHOG(input, xSize, ySize);
+#elif defined(CUSTOM)
+	return calculateFeatureVectorCustom(input, xSize, ySize);
+#endif
+
+}
+
+vector<double> calculateFeatureVectorHOG(const uchar input[], int xSize, int ySize)
+{
+	vector<double> features;
+
+	uchar* G = new uchar[xSize*ySize];
+	RGBtoLuminance(input, xSize, ySize, G);
+
+	double* angle = new double[xSize*ySize];
+	performSobelEdgeDetection(G, xSize, ySize, angle);
+
+	//Calculating upper bounds of angle
+	double gr[HISTOGRAM_SIZE];
+	for (int i = 0; i < HISTOGRAM_SIZE; i++)
+		gr[i] = 2.0 * PI * (i + 1) / HISTOGRAM_SIZE;
+
+	double histogram[HISTOGRAM_SIZE];
+	double sum = 0;
+	//Splitting images in blocks BLOCK_SIZE*BLOCK_SIZE
+	for (int i = 0; i < xSize; i += BLOCK_SIZE) {
+		for (int j = 0; j < ySize; j += BLOCK_SIZE) {
+
+			//Reseting histogram
+			for (int p = 0; p < HISTOGRAM_SIZE; p++)
+				histogram[p] = 0;
+
+			//Getting block BLOCK_SIZE*BLOCK_SIZE
+			for (int k1 = i; k1 < i + BLOCK_SIZE; k1++) {
+				for (int k2 = j; k2 < j + BLOCK_SIZE; k2++) {
+
+					//Used for normalisation
+					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
+
+					//Filling histogram based on angle
+					for (int p = 0; p < HISTOGRAM_SIZE; p++) {
+						if (angle[k2*xSize + k1] < gr[p]) {
+							histogram[p] += G[k2*xSize + k1];
+							break;
+						}
+					}
+
+				}
+			}
+
+			//Filling return value
+			for (int p = 0; p < HISTOGRAM_SIZE; p++)
+				features.push_back(histogram[p]);
+
+		}
+	}
+
+	//Normalisation
+	sum = sqrt(sum);
+	for (auto it = features.begin(); it != features.end(); it++)
+		*it /= sum;
+
+	delete[] G;
+	delete[] angle;
+
+	return features;
+}
+
+std::vector<double> calculateFeatureVectorCustom(const uchar input[], int xSize, int ySize)
+{
+	vector<double> features;
+
+	uchar* G = new uchar[xSize*ySize];
+	RGBtoLuminance(input, xSize, ySize, G);
+
+	double* angle = new double[xSize*ySize];
+	performCannyEdgeDetection(G, xSize, ySize, 0, 0.3, angle);
+
+	const int histogramPostitions = 7;
+	double histogram[histogramPostitions];
+	double sum = 0;
+	//Splitting images in blocks BLOCK_SIZE*BLOCK_SIZE
+	for (int i = 0; i < xSize; i += BLOCK_SIZE) {
+		for (int j = 0; j < ySize; j += BLOCK_SIZE) {
+
+			//Reset histogram
+			for (int p = 0; p < histogramPostitions; p++)
+				histogram[p] = 0;
+
+			//Getting block BLOCK_SIZE*BLOCK_SIZE
+			for (int k1 = i; k1 < i + BLOCK_SIZE; k1++) {
+				for (int k2 = j; k2 < j + BLOCK_SIZE; k2++) {
+
+					//Used for normalisation
+					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
+
+					//Filling histogram
+					if (angle[k2*xSize + k1] == 90) { // |
+						if (k1 < xSize / 2) { //left
+							if (k2 < ySize / 2)  //top
+								histogram[VERTICAL_LEFT_TOP] += G[k2*xSize + k1];
+							else //bottom
+								histogram[VERTICAL_LEFT_BOTTOM] += G[k2*xSize + k1];
+						}
+						else { // right
+							if (k2 < ySize / 2) //top
+								histogram[VERTICAL_RIGHT_TOP] += G[k2*xSize + k1];
+							else //bottom
+								histogram[VERTICAL_RIGHT_BOTTOM] += G[k2*xSize + k1];
+						}
+					}
+					else { // -
+						if (k2 < ySize / 3) //top
+							histogram[HORIZONTAL_TOP] += G[k2*xSize + k1];
+						else if (k2 > ySize / 3 && k2 < ySize - (ySize / 3)) //middle
+							histogram[HORIZONTAL_MIDDLE] += G[k2*xSize + k1];
+						else //bottom
+							histogram[HORIZONTAL_BOTTOM] += G[k2*xSize + k1];
+					}
+
+				}
+			}
+
+			//Filling return value
+			for (int p = 0; p < histogramPostitions; p++) {
+				features.push_back(histogram[p]);
+			}
+
+		}
+	}
+
+	//Normalisation
+	sum = sqrt(sum);
+	for (auto it = features.begin(); it != features.end(); it++) {
+		*it /= sum;
+	}
+
+	delete[] G;
+	delete[] angle;
+
+	return features;
+}
+
 
 
 void extendBorders(uchar input[], int xSize, int ySize, uchar output[], int delta)
@@ -79,7 +240,7 @@ void convolve2D(uchar image[], int xSize, int ySize, double* filterCoeff, int N)
 }
 
 
-void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* G, double* angle)
+void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* angle)
 {
 	int N = 3;
 	int delta = (N - 1) / 2;
@@ -112,10 +273,10 @@ void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* G, d
 				}
 			}
 
-			// Save magnitude
-			G[j*xSize + i] = sqrt(Gh*Gh + Gv*Gv);
+			// Calculate and save magnitude
+			input[j*xSize + i] = sqrt(Gh*Gh + Gv*Gv);
 
-			// Save angle
+			// Calculate and save angle
 			double edgeAngle = atan2(Gv, Gh);
 			if (edgeAngle < 0) 
 				edgeAngle += 2 * PI;
@@ -126,163 +287,7 @@ void performSobelEdgeDetection(uchar input[], int xSize, int ySize, double* G, d
 	delete[] extendedImage;	
 }
 
-vector<double> calculateFeatureVectorHOG(const uchar input[], int xSize, int ySize)
-{
-	vector<double> features;
 
-	uchar* Y_buff = new uchar[xSize*ySize];
-	char* U_buff = new char[xSize*ySize / 4];
-	char* V_buff = new char[xSize*ySize / 4];
-	RGBtoYUV420(input, xSize, ySize, Y_buff, U_buff, V_buff);
-	
-	double* G = new double[xSize*ySize];
-	double* angle = new double[xSize*ySize];
-	performSobelEdgeDetection(Y_buff, xSize, ySize, G, angle);
-
-	int histogramSize = HISTOGRAM_SIZE;
-	int blockSize = BLOCK_SIZE;
-
-	//Calculating upper bounds of angle
-	double* gr = new double[histogramSize];
-	for (int i = 0; i < histogramSize; i++) {
-		gr[i] = 2.0 * PI * (i + 1) / histogramSize;
-	}
-
-	double* histogram = new double[histogramSize];
-	double sum = 0;
-	for (int i = 0; i < xSize; i += blockSize) {
-		for (int j = 0; j < ySize; j += blockSize) {
-
-			//Reseting histogram
-			for (int p = 0; p < histogramSize; p++)
-				histogram[p] = 0;
-
-			//Filling histogram
-			for (int k1 = i; k1 < i + blockSize; k1++) {
-				for (int k2 = j; k2 < j + blockSize; k2++) {
-
-					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
-					
-					for (int p = 0; p < histogramSize; p++) {
-						if (angle[k2*xSize + k1] < gr[p]) {
-							histogram[p] += G[k2*xSize + k1];
-							break;
-						}
-					}
-
-				}
-			}
-
-			//Filling return value
-			for (int p = 0; p < histogramSize; p++) {
-				features.push_back(histogram[p]);
-			}
-		}
-	}
-
-	//Normalisation
-	sum = sqrt(sum);
-	for (auto it = features.begin(); it != features.end(); it++) {
-		*it /= sum;
-	}
-
-	delete[] histogram;
-	delete[] gr;
-	delete[] G;
-	delete[] angle;
-	delete[] Y_buff;
-	delete[] U_buff;
-	delete[] V_buff;
-	
-	return features;
-}
-
-
-
-std::vector<double> calculateFeatureVector(const uchar input[], int xSize, int ySize) {
-
-#ifdef HOG
-	return calculateFeatureVectorHOG(input, xSize, ySize);
-#else
-	return calculateFeatureVectorCustom(input, xSize, ySize);
-#endif
-
-}
-
-std::vector<double> calculateFeatureVectorCustom(const uchar input[], int xSize, int ySize) {
-
-	vector<double> features;
-
-	uchar* G = new uchar[xSize*ySize];
-	char* U_buff = new char[xSize*ySize / 4];
-	char* V_buff = new char[xSize*ySize / 4];
-	RGBtoYUV420(input, xSize, ySize, G, U_buff, V_buff);
-	delete[] U_buff;
-	delete[] V_buff;
-
-	double* angle = new double[xSize*ySize];
-	performCannyEdgeDetection(G, xSize, ySize, 0, 0.3, angle);
-
-	double histogram[7] = { 0, 0, 0, 0, 0, 0, 0 };
-	int blockSize = BLOCK_SIZE;
-	double sum = 0;
-	for (int i = 0; i < xSize; i += blockSize) {
-		for (int j = 0; j < ySize; j += blockSize) {
-
-			//Reset histogram to 0
-			for (int p = 0; p < 7; p++)
-				histogram[p] = 0;
-
-			//Fill histogram
-			for (int k1 = i; k1 < i + blockSize; k1++) {
-				for (int k2 = j; k2 < j + blockSize; k2++) {
-
-					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
-
-					if (angle[k2*xSize + k1] == 90) { // |
-						if (k1 < xSize / 2) { //left
-							if (k2 < ySize / 2)  //top
-								histogram[3] += G[k2*xSize + k1];
-							else //bottom
-								histogram[4] += G[k2*xSize + k1];
-						}
-						else { // right
-							if (k2 < ySize / 2) //top
-								histogram[5] += G[k2*xSize + k1];
-							else //bottom
-								histogram[6] += G[k2*xSize + k1];
-						}
-					}
-					else { // -
-						if (k2 < ySize / 3) //top
-							histogram[0] += G[k2*xSize + k1];
-						else if (k2 > ySize / 3 && k2 < ySize - (ySize / 3)) //middle
-							histogram[1] += G[k2*xSize + k1];
-						else //bottom
-							histogram[2] += G[k2*xSize + k1];
-					}
-
-				}
-			}
-
-			//Filling return value
-			for (int p = 0; p < 7; p++) {
-				features.push_back(histogram[p]);
-			}
-
-		}
-	}
-
-	sum = sqrt(sum);
-	for (auto it = features.begin(); it != features.end(); it++) {
-		*it /= sum;
-	}	
-
-	delete[] G;
-	delete[] angle;
-
-	return features;
-}
 
 void nonMaxSupression(double edgeMagnitude[], uchar edgeDirection[], int xSize, int ySize, double out[])
 {
@@ -345,7 +350,7 @@ void performCannyEdgeDetection(uchar input[], int xSize, int ySize, double thres
 
 	uchar* extendedImage = new uchar[newXSize * newYSize];
 
-	double* edgeMagnitude = new double[xSize * ySize]; 
+	double* edgeMagnitude = new double[xSize * ySize];
 	uchar* edgeDirection = new uchar[xSize * ySize];
 	double* nonMaxSup = new double[xSize * ySize];
 
@@ -375,11 +380,11 @@ void performCannyEdgeDetection(uchar input[], int xSize, int ySize, double thres
 			double edgeAngle = atan2(Gv, Gh);
 			if (edgeAngle < 0)
 				edgeAngle += PI;
-			if ((edgeAngle < PI/8) || (edgeAngle > 7 * PI/8))
+			if ((edgeAngle < PI / 8) || (edgeAngle > 7 * PI / 8))
 				edgeDirection[j * xSize + i] = 0;
-			else if (edgeAngle < 3 * PI/8)
+			else if (edgeAngle < 3 * PI / 8)
 				edgeDirection[j * xSize + i] = 45;
-			else if (edgeAngle < 5 * PI/8)
+			else if (edgeAngle < 5 * PI / 8)
 				edgeDirection[j * xSize + i] = 90;
 			else
 				edgeDirection[j * xSize + i] = 135;
@@ -387,7 +392,7 @@ void performCannyEdgeDetection(uchar input[], int xSize, int ySize, double thres
 			// Calculate and save angle
 			if (edgeAngle > PI / 4 && edgeAngle < 3 * PI / 4)
 				angle[j*xSize + i] = 90;
-			else 
+			else
 				angle[j*xSize + i] = 0;
 
 		}
@@ -446,7 +451,7 @@ void performCannyEdgeDetection(uchar input[], int xSize, int ySize, double thres
 
 				if (mag1 > threshold2 || mag2 > threshold2)
 					input[j * xSize + i] = edgeMagnitude[j * xSize + i];
-				else 
+				else
 					input[j*xSize + i] = 0;
 			}
 		}

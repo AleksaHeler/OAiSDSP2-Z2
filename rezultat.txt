@@ -4,62 +4,58 @@ Parametri u TainSVM.cpp:
 
 HOG:
 	Zadatak2:
-		Cross Validation Accuracy =  93.48 %
-		Prediction accuracy:  99.94 %
-		ImageDSP accuracy: 20/20
+		Cross Validation Accuracy = 95 %
+		Prediction accuracy: 97.3 %
+		ImageDSP accuracy: 18/20
 
 	Zadatak3:
 		Block size: 8x8, Histogram size: 12
-			Cross Validation Accuracy =  93.6 %
+			Cross Validation Accuracy = 94.56 %
 
 		Block size: 8x8, Histogram size: 16
-			Cross Validation Accuracy =  93.8 %
+			Cross Validation Accuracy = 94.74 %
 
 		Block size: 8x8, Histogram size: 18
-			Cross Validation Accuracy =  93.58
+			Cross Validation Accuracy = 94.62 %
 
 		Block size: 6x6, Histogram size: 9
-			Cross Validation Accuracy =  91.36 %
-
-		Block size: 12x12, Histogram size: 9
-			Cross Validation Accuracy =  91.38 %
-
-		Block size: 6x6, Histogram size: 16
-			Cross Validation Accuracy =  95.66 %
-
-		Block size: 12x12, Histogram size: 16
-			Cross Validation Accuracy =  91.6 %
+			Cross Validation Accuracy = 96.2 %
 
 		Block size: 6x6, Histogram size: 12
-			Cross Validation Accuracy =  95.46 %
+			Cross Validation Accuracy = 96.08 %
 
 		Block size: 6x6, Histogram size: 18
-			Cross Validation Accuracy =  95.8 %
+			Cross Validation Accuracy = 96.16 %
 
-		Block size: 4x4, Histogram size: 18
-			Cross Validation Accuracy =  96.72 %
+		Block size: 4x4, Histogram size: 16
+			Cross Validation Accuracy = 96.64 %
+
+	       ***********************************************
+	       *Block size: 4x4, Histogram size: 18          *
+	       *	Cross Validation Accuracy = 96.9 %   *
+	       ***********************************************
 
 		Block size: 4x4, Histogram size: 20
-			Cross Validation Accuracy =  96.38 %
+			Cross Validation Accuracy = 96.76 %
 
 		Block size: 2x2, Histogram size: 18
-			Cross Validation Accuracy =  96.5 %
+			Cross Validation Accuracy = 96.66 %
+
+		Block size: 2x2, Histogram size: 20
+			Cross Validation Accuracy = 96.54 %
 
 Custom:
-	Zadatak2:
-		Cross Validation Accuracy =  93.22 %
-		Prediction accuracy:  99.64 %
-		ImageDSP accuracy: 20/20
+	Zadatak2: (Block size: 4x4 //Best cross validation accuracy)
+		Cross Validation Accuracy = 94.58 %
+		Prediction accuracy: 96.68 %
+		ImageDSP accuracy: 18/20
 
 	Zadatak3:
-		Block size: 4x4
-			Cross Validation Accuracy =  93.22 %
-
 		Block size: 6x6
-			Cross Validation Accuracy =  91.48 %
+			Cross Validation Accuracy = 93.44 %
 
 		Block size: 8x8
-			Cross Validation Accuracy =  89.48 %
+			Cross Validation Accuracy = 93.32 %
 
 
 
