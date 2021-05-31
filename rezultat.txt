@@ -1,4 +1,4 @@
-Parametri u TainSVM.cpp:
+Parametri u TrainSVM.cpp:
 	kernel_type = LINEAR
 	C = 1
 
@@ -45,21 +45,21 @@ HOG:
 			Cross Validation Accuracy = 96.54 %
 
 Custom:
-	Zadatak2: (Block size: 4x4 //Best cross validation accuracy)
-		Cross Validation Accuracy = 94.58 %
-		Prediction accuracy: 96.68 %
+	Zadatak2: (Block size: 2x2 //Best cross validation accuracy)
+		Cross Validation Accuracy = 95.28 %
+		Prediction accuracy: 98 %
 		ImageDSP accuracy: 18/20
 
 	Zadatak3:
-		Block size: 6x6
-			Cross Validation Accuracy = 93.44 %
-
 		Block size: 8x8
 			Cross Validation Accuracy = 93.32 %
 
+		Block size: 6x6
+			Cross Validation Accuracy = 93.44 %
 
+		Block size: 4x4
+			Cross Validation Accuracy = 94.58 %
 
-
-
-
+		Block size: 2x2
+			Cross Validation Accuracy = 95.28 %
 
