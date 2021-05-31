@@ -13,10 +13,10 @@ using namespace std;
 //#define CUSTOM
 
 //Chose parametars
-#define BLOCK_SIZE 4 //BLOCK_SIZE 4 => 4 * 4 = 16
+#define BLOCK_SIZE 8 //BLOCK_SIZE 4 => 4 * 4 = 16
 
 //Only has effect when using HOG
-#define HISTOGRAM_SIZE 18
+#define HISTOGRAM_SIZE 9
 
 //Only has effect when using CUSTOM
 //default histogram size is 7 and size is defined in const variable in calculateFeatureVectorCustom
@@ -73,10 +73,19 @@ vector<double> calculateFeatureVectorHOG(const uchar input[], int xSize, int ySi
 					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
 
 					//Filling histogram based on angle
-					for (int p = 0; p < HISTOGRAM_SIZE; p++) {
-						if (angle[k2*xSize + k1] < gr[p]) {
-							histogram[p] += G[k2*xSize + k1];
-							break;
+					if (angle[k2*xSize + k1] > gr[HISTOGRAM_SIZE - 1]) 
+					{
+						gr[HISTOGRAM_SIZE - 1] = angle[k2*xSize + k1];
+					}
+					else
+					{
+						for (int p = 0; p < HISTOGRAM_SIZE; p++) 
+						{
+							if (angle[k2*xSize + k1] < gr[p]) 
+							{
+								histogram[p] += G[k2*xSize + k1];
+								break;
+							}
 						}
 					}
 
@@ -101,7 +110,7 @@ vector<double> calculateFeatureVectorHOG(const uchar input[], int xSize, int ySi
 	return features;
 }
 
-std::vector<double> calculateFeatureVectorCustom(const uchar input[], int xSize, int ySize)
+vector<double> calculateFeatureVectorCustom(const uchar input[], int xSize, int ySize)
 {
 	vector<double> features;
 
