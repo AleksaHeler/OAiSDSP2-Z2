@@ -73,7 +73,7 @@ vector<double> calculateFeatureVectorHOG(const uchar input[], int xSize, int ySi
 					sum += G[k2*xSize + k1] * G[k2*xSize + k1];
 
 					//Filling histogram based on angle
-					if (angle[k2*xSize + k1] > gr[HISTOGRAM_SIZE - 1]) 
+					if (angle[k2*xSize + k1] >= gr[HISTOGRAM_SIZE - 1]) 
 					{
 						histogram[HISTOGRAM_SIZE - 1] = angle[k2*xSize + k1];
 					}
